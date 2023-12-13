@@ -44,14 +44,22 @@ class Loadingscreen():
             pass
 
 class GUI():
-    def __init__(self,root):
-        self.root=root
-        #------------------------------------------------------------------------------------------- main frames
+    def __init__(self, root):
+        self.root = root
 
-        self.widget = Frame(self.root, bg='white', bd=5)
-        self.widget.pack(fill='both', expand=1)
+        self.widget = Frame(self.root, bg='#333', bd=5)
+        self.widget.pack(fill='both',expand=1)
 
+        self.menu = Frame(self.widget, bg='#333', bd=5)
+        self.menu.pack(side='top',fill='x')
 
+        # Create four buttons on top of each other within the 'widget' frame
+        button_texts = ['ΑΓΩΝΕΣ', 'ΒΑΘΜΟΛΟΓΙΕΣ', 'ΟΜΑΔΕΣ', 'ΣΤΑΤΙΣΤΙΚΑ']
+        for text in button_texts:
+            button = Button(self.menu, text=text, height=4,font='ariel 15 bold')
+            button.pack(side='left', padx=5, pady=5 ,fill='x',expand=1)
+
+        
 # main        
 
 class Main():
@@ -65,8 +73,10 @@ class Main():
             #-----------------------------------------
             root.title('Basketball tournament')
             root.state('zoomed')
+            root.configure(background = 'black')
             #root.geometry('1915x1050')
             GUI(root)
+            
             root.mainloop()
         except:
             pass
