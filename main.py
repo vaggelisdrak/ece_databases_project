@@ -48,16 +48,31 @@ class GUI():
         self.root = root
 
         self.widget = Frame(self.root, bg='#333', bd=5)
-        self.widget.pack(fill='both',expand=1)
+        self.widget.pack(fill='both', expand=1)
 
         self.menu = Frame(self.widget, bg='#333', bd=5)
-        self.menu.pack(side='top',fill='x')
+        self.menu.pack(side='top', fill='x')
 
         # Create four buttons on top of each other within the 'widget' frame
         button_texts = ['ΑΓΩΝΕΣ', 'ΒΑΘΜΟΛΟΓΙΕΣ', 'ΟΜΑΔΕΣ', 'ΣΤΑΤΙΣΤΙΚΑ']
         for text in button_texts:
-            button = Button(self.menu, text=text, height=4,font='ariel 15 bold')
-            button.pack(side='left', padx=5, pady=5 ,fill='x',expand=1)
+            button = Button(self.menu, text=text, height=4, font='ariel 15 bold', command=lambda t=text: self.show_window(t))
+            button.pack(side='left', padx=5, pady=5, fill='x', expand=1)
+
+        self.label = Label(self.widget, text="", font='ariel 15 bold', bg='#333', fg='white')
+        self.label.pack(fill='x')
+
+    def show_window(self, text):
+        self.label.config(text=text)
+        if text == 'ΑΓΩΝΕΣ':
+            print('agones func')
+        if text == 'ΒΑΘΜΟΛΟΓΙΕΣ':
+            print('vathmologies func')
+        if text == 'ΟΜΑΔΕΣ':
+            print('omades func')
+        if text == 'ΣΤΑΤΙΣΤΙΚΑ':
+            self.label.config(text=text)
+            print('stats func')
 
         
 # main        
