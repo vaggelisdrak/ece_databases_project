@@ -74,27 +74,37 @@ class GUI():
             self.label.config(text=text)
             print('stats func')
 
+    def show_games(self):
+        pass
+
+    def show_teams(self):
+        pass
+
+    def show_stats(self):
+        pass
+
+    def show_stats(self):
+        pass
+
         
 # main        
 
 class Main():
     def __init__(self): 
-        try: 
-            root = Tk()
-            root.title('Basketball tournament')
-            root.state('zoomed')#fullscreen
-            #root.resizable(False,False)
-            Loadingscreen(root)
-            #-----------------------------------------
-            root.title('Basketball tournament')
-            root.state('zoomed')
-            root.configure(background = 'black')
-            #root.geometry('1915x1050')
-            GUI(root)
-            
-            root.mainloop()
-        except:
-            pass
+        root = Tk()
+        root.title('Basketball tournament')
+        root.state('zoomed')#fullscreen
+        #root.resizable(False,False)
+        Loadingscreen(root)
+        #-----------------------------------------
+        root.title('Basketball tournament')
+        root.state('zoomed')
+        root.configure(background = 'black')
+        #root.geometry('1915x1050')
+        GUI(root)
+        
+        root.mainloop()
+
       
 if __name__ == "__main__":
     Main()
