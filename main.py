@@ -95,6 +95,42 @@ class GUI():
 
         # Close the connection
         connection.close()
+        
+        # Remove the old text widgets if they exist
+        if hasattr(self, 'text_widget'):
+            self.text_widget.destroy()
+        if hasattr(self, 'text_widget1'):
+            self.text_widget1.destroy()
+        if hasattr(self, 'text_widget2'):
+            self.text_widget2.destroy()
+        if hasattr(self, 'frame'):
+            self.frame.destroy()
+
+        # Create a new frame widget
+        self.frame = Frame(self.widget)
+        self.frame.pack()
+
+
+        # Create two new text widgets
+        self.text_widget1 = Text(self.frame, width=50, height=30, bg='#333', fg='white', font=('Arial', 12))
+        self.text_widget2 = Text(self.frame, width=50, height=30, bg='#333', fg='white', font=('Arial', 12))
+
+        # Place the text widgets in the frame using a grid layout
+        self.text_widget1.grid(row=0, column=0)
+        self.text_widget2.grid(row=0, column=1)
+
+        for i, row in enumerate(games_data):
+            if row[1] == 'REGULAR SEASON':
+                new_row = row[:1] + row[2:4] + row[5:]  # Create a new tuple without the second and fifth elements
+                row_str = f" {new_row[0]}\n {new_row[1]}   {new_row[3]}\n {new_row[2]}   {new_row[4]}\n"
+            else:
+                row_str = ', '.join(map(str, row))
+
+            # Insert the row into the first text widget if i is even, otherwise insert it into the second text widget
+            if i % 2 == 0:
+                self.text_widget1.insert('end', row_str + '\n')
+            else:
+                self.text_widget2.insert('end', row_str + '\n')
 
     def show_teams(self):
         # Connect to the SQLite database and fetch teams data
@@ -117,14 +153,80 @@ class GUI():
 
         # Close the connection
         connection.close()
+        
+        # Remove the old text widgets if they exist
+        if hasattr(self, 'text_widget'):
+            self.text_widget.destroy()
+        if hasattr(self, 'text_widget1'):
+            self.text_widget1.destroy()
+        if hasattr(self, 'text_widget2'):
+            self.text_widget2.destroy()
+        if hasattr(self, 'frame'):
+            self.frame.destroy()
+
+        # Create a new frame widget
+        self.frame = Frame(self.widget)
+        self.frame.pack()
+
+        team_widgets = {}  # Create an empty dictionary to store the text widgets for each team
+        team_count = 0  # Initialize a counter for the number of teams
+
+        for row in teams_data:
+            team_name = row[0]  # Get the team name
+            team_player = row[1]  # Get the player name
+
+            # If the team name is not in the dictionary, create a new text widget for it
+            if team_name not in team_widgets:
+                text_widget = Text(self.frame, width=25, height=11, bg='#333', fg='white', font=('Arial', 12))
+                text_widget.grid(row=team_count // 6, column=team_count % 6)  # Place the text widget in the appropriate row and column
+                text_widget.tag_configure("bold", font=("Arial", 14, "bold"))
+                text_widget.insert('end', ' ' + team_name + '\n\n', "bold")
+                team_widgets[team_name] = text_widget  # Add the text widget to the dictionary
+                team_count += 1  # Increment the counter for the number of teams
+
+            # Insert the player name into the text widget for the team
+            team_widgets[team_name].insert('end', ' '+ team_player + '\n')
+        
+            # New code to fill remaining cells with gray widgets
+            rows = team_count // 6
+            if team_count % 6 != 0:  # If there are any teams in the last row
+                rows += 1  # Add one to the number of rows
+
+            for i in range(team_count, rows * 6):  # For each remaining cell in the grid
+                text_widget = Text(self.frame, width=25, height=11, bg='#333', fg='white', font=('Arial', 12))  # Create a gray text widget
+                text_widget.grid(row=i // 6, column=i % 6)  # Place the text widget in the appropriate row and column
+                    
+
 
     def show_standings(self):
-        pass
+         # Remove the old text widget if it exists
+        if hasattr(self, 'text_widget'):
+            self.text_widget.destroy()
+        if hasattr(self, 'text_widget1'):
+            self.text_widget1.destroy()
+        if hasattr(self, 'text_widget2'):
+            self.text_widget2.destroy()
+        if hasattr(self, 'frame'):
+            self.frame.destroy()
 
     def show_stats(self):
         # Connect to the SQLite database and fetch teams data
         connection = sqlite3.connect('project_db.db')
         cursor = connection.cursor()
+        
+        # Remove the old text widgets if they exist
+        if hasattr(self, 'text_widget'):
+            self.text_widget.destroy()
+        if hasattr(self, 'text_widget1'):
+            self.text_widget1.destroy()
+        if hasattr(self, 'text_widget2'):
+            self.text_widget2.destroy()
+        if hasattr(self, 'frame'):
+            self.frame.destroy()
+            
+        # Create a new text widget and insert the data
+        self.text_widget = Text(self.widget, width=100, height=50, bg='#333', fg='white', font=('Arial', 12))
+        self.text_widget.pack()
 
         # Your SQL query FOR PPG ---------------------------------------------
         sql_query = """
@@ -141,6 +243,13 @@ class GUI():
         ppg_standings = cursor.fetchall()  # Fetch all results
 
         print(ppg_standings)
+        
+        self.text_widget.tag_configure("bold", font=("Arial", 14, "bold"))
+        self.text_widget.insert('end', ' Points Per Game' + '\n\n', "bold")
+        
+        for row in ppg_standings:
+            row_str = ', '.join(map(str, row))
+            self.text_widget.insert('end', ' '+ row_str + '\n')
 
         # Your SQL query RPG --------------------------------------------------
         sql_query = """
@@ -157,7 +266,13 @@ class GUI():
         rpg_standings = cursor.fetchall()  # Fetch all results
 
         print(rpg_standings)
-
+        
+        self.text_widget.tag_configure("bold", font=("Arial", 14, "bold"))
+        self.text_widget.insert('end', '\n\n Rebounds Per Game' + '\n\n', "bold")
+        
+        for row in rpg_standings:
+            row_str = ', '.join(map(str, row))
+            self.text_widget.insert('end', ' '+ row_str + '\n')
 
         # Your SQL query FOR APG -------------------------------------------------
         sql_query = """
@@ -174,6 +289,13 @@ class GUI():
         apg_standings = cursor.fetchall()  # Fetch all results
 
         print(apg_standings)
+        
+        self.text_widget.tag_configure("bold", font=("Arial", 14, "bold"))
+        self.text_widget.insert('end', '\n\n Assists Per Game' + '\n\n', "bold")
+        
+        for row in apg_standings:
+            row_str = ', '.join(map(str, row))
+            self.text_widget.insert('end', ' '+ row_str + '\n')
 
         # Close the connection
         connection.close()
