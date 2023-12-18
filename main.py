@@ -65,25 +65,54 @@ class GUI():
     def show_window(self, text):
         self.label.config(text=text)
         if text == 'ΑΓΩΝΕΣ':
-            print('agones func')
+            self.show_games()
         if text == 'ΒΑΘΜΟΛΟΓΙΕΣ':
-            print('vathmologies func')
+            self.show_standings()
         if text == 'ΟΜΑΔΕΣ':
-            print('omades func')
+            self.show_teams()
         if text == 'ΣΤΑΤΙΣΤΙΚΑ':
-            self.label.config(text=text)
-            print('stats func')
+            self.show_stats()
 
     def show_games(self):
-        pass
+        # Connect to the SQLite database
+        connection = sqlite3.connect('project_db.db')
+        cursor = connection.cursor()
+
+        # Your SQL query
+        sql_query = """
+        SELECT a.Ημερομηνία, a.Είδος, p.'HOME TEAM', p.'AWAY TEAM ', p.Γήπεδο, p.'Points ΗΟΜΕ', p.'Points AWAY'
+        FROM ΑΓΩΝΑΣ AS a, Παίζει AS p
+        WHERE a.id_game = p.id_game
+        GROUP BY a.id_game
+        ORDER BY a.Ημερομηνία
+        """
+
+        # Execute the query
+        cursor.execute(sql_query)
+        games_data = cursor.fetchall()  # Fetch all results
+
+        print(games_data)
+
+        # Display the data (for example, in the label)
+        games_info = ""
+        for game in games_data:
+            games_info += f"Date: {game[0]}, Type: {game[1]}, Home Team: {game[2]}, Away Team: {game[3]}, Venue: {game[4]}, Home Points: {game[5]}, Away Points: {game[6]}\n"
+
+        self.label.config(text=games_info)
+
+        # Close the connection
+        connection.close()
 
     def show_teams(self):
         pass
 
-    def show_stats(self):
+    def show_standings(self):
         pass
 
     def show_stats(self):
+        pass
+
+    def add_game(self):
         pass
 
         
