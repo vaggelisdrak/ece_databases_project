@@ -93,27 +93,91 @@ class GUI():
 
         print(games_data)
 
-        # Display the data (for example, in the label)
-        games_info = ""
-        for game in games_data:
-            games_info += f"Date: {game[0]}, Type: {game[1]}, Home Team: {game[2]}, Away Team: {game[3]}, Venue: {game[4]}, Home Points: {game[5]}, Away Points: {game[6]}\n"
-
-        self.label.config(text=games_info)
-
         # Close the connection
         connection.close()
 
     def show_teams(self):
-        pass
+        # Connect to the SQLite database and fetch teams data
+        connection = sqlite3.connect('project_db.db')
+        cursor = connection.cursor()
+
+        # Your SQL query
+        sql_query = """
+        SELECT om.Όνομα AS "ΟΜΑΔΑ", p.Ονοματεπώνυμο
+        FROM ΟΜΑΔΑ AS om
+        LEFT JOIN ΠΑΙΚΤΗΣ AS p
+        ON om.id_team = p.id_team
+        """
+
+        # Execute the query
+        cursor.execute(sql_query)
+        teams_data = cursor.fetchall()  # Fetch all results
+
+        print(teams_data)
+
+        # Close the connection
+        connection.close()
 
     def show_standings(self):
         pass
 
     def show_stats(self):
-        pass
+        # Connect to the SQLite database and fetch teams data
+        connection = sqlite3.connect('project_db.db')
+        cursor = connection.cursor()
 
-    def add_game(self):
-        pass
+        # Your SQL query FOR PPG ---------------------------------------------
+        sql_query = """
+        SELECT P.Ονοματεπώνυμο, AVG(A.Points) AS PPG
+        FROM "Αγωνίζεται " AS A, ΠΑΙΚΤΗΣ AS P
+        WHERE P.id_player = A.id_player
+        GROUP BY A.id_player
+        ORDER BY PPG DESC
+        LIMIT 5
+        """
+
+        # Execute the query FOR PPG
+        cursor.execute(sql_query)
+        ppg_standings = cursor.fetchall()  # Fetch all results
+
+        print(ppg_standings)
+
+        # Your SQL query RPG --------------------------------------------------
+        sql_query = """
+        SELECT P.Ονοματεπώνυμο, AVG(A.Rebounds) AS RPG
+        FROM "Αγωνίζεται " AS A, ΠΑΙΚΤΗΣ AS P
+        WHERE P.id_player = A.id_player
+        GROUP BY A.id_player
+        ORDER BY RPG DESC
+        LIMIT 5
+        """
+
+        # Execute the query FOR RPG
+        cursor.execute(sql_query)
+        rpg_standings = cursor.fetchall()  # Fetch all results
+
+        print(rpg_standings)
+
+
+        # Your SQL query FOR APG -------------------------------------------------
+        sql_query = """
+        SELECT P.Ονοματεπώνυμο, AVG(A.Assists) AS APG
+        FROM "Αγωνίζεται " AS A, ΠΑΙΚΤΗΣ AS P
+        WHERE P.id_player = A.id_player
+        GROUP BY A.id_player
+        ORDER BY APG DESC
+        LIMIT 5
+        """
+
+        # Execute the query
+        cursor.execute(sql_query)
+        apg_standings = cursor.fetchall()  # Fetch all results
+
+        print(apg_standings)
+
+        # Close the connection
+        connection.close()
+
 
         
 # main        
