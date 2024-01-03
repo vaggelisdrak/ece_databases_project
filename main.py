@@ -3,9 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from PIL import ImageTk,Image 
 import sqlite3
-import re
 import time
-import webbrowser
 
 class Loadingscreen():
     '''loading bar'''
@@ -145,11 +143,21 @@ class GUI():
         ON om.id_team = p.id_team
         """
 
+        cursor.execute('CREATE INDEX idx_show_teams ON ΟΜΑΔΑ(id_team)')
+
+        # Query without an index
+        start_time = time.time()
+        
         # Execute the query
         cursor.execute(sql_query)
+        
         teams_data = cursor.fetchall()  # Fetch all results
 
-        print(teams_data)
+        #print(teams_data)
+
+        end_time = time.time()
+        execution_time_without_index = end_time - start_time
+        print(f"Execution time without index: {execution_time_without_index} seconds")
 
         # Close the connection
         connection.close()
@@ -196,8 +204,6 @@ class GUI():
                 text_widget = Text(self.frame, width=25, height=11, bg='#333', fg='white', font=('Arial', 12))  # Create a gray text widget
                 text_widget.grid(row=i // 6, column=i % 6)  # Place the text widget in the appropriate row and column
                     
-
-
     def show_standings(self):
         
         # Connect to the SQLite database
