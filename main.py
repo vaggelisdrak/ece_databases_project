@@ -3,7 +3,10 @@ from tkinter import ttk
 from tkinter import messagebox
 from PIL import ImageTk,Image 
 import sqlite3
+import re
 import time
+import webbrowser
+from datetime import datetime
 
 class Loadingscreen():
     '''loading bar'''
@@ -108,6 +111,8 @@ class GUI():
         self.frame = Frame(self.widget)
         self.frame.pack()
 
+        # Convert date from MM/DD/YYYY to YYYY-MM-DD and reverse the list
+        games_data = sorted([(datetime.strptime(row[0], '%m/%d/%Y').strftime('%Y-%m-%d'),) + row[1:] for row in games_data], reverse=True)
 
         # Create two new text widgets
         self.text_widget1 = Text(self.frame, width=50, height=30, bg='#333', fg='white', font=('Arial', 12))
@@ -118,11 +123,15 @@ class GUI():
         self.text_widget2.grid(row=0, column=1)
 
         for i, row in enumerate(games_data):
+            # Convert date from 'YYYY-MM-DD' to 'MM/DD/YYYY'
+            formatted_date = datetime.strptime(row[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            
             if row[1] == 'REGULAR SEASON':
-                new_row = row[:1] + row[2:4] + row[5:]  # Create a new tuple without the second and fifth elements
+                new_row = (formatted_date,) + row[2:4] + row[5:] # Create a new tuple without the second and fifth elements
                 row_str = f" {new_row[0]}\n {new_row[1]}\t\t{new_row[3]}\n {new_row[2]}\t\t{new_row[4]}\n"
             else:
-                row_str = ', '.join(map(str, row))
+                new_row = (formatted_date,) + row[2:4] + row[5:] # Create a new tuple without the second and fifth elements
+                row_str = f" {new_row[0]}\n {new_row[1]}\t\t{new_row[3]}\n {new_row[2]}\t\t{new_row[4]}\n"
 
             # Insert the row into the first text widget if i is even, otherwise insert it into the second text widget
             if i % 2 == 0:
@@ -143,21 +152,11 @@ class GUI():
         ON om.id_team = p.id_team
         """
 
-        cursor.execute('CREATE INDEX idx_show_teams ON ΟΜΑΔΑ(id_team)')
-
-        # Query without an index
-        start_time = time.time()
-        
         # Execute the query
         cursor.execute(sql_query)
-        
         teams_data = cursor.fetchall()  # Fetch all results
 
-        #print(teams_data)
-
-        end_time = time.time()
-        execution_time_without_index = end_time - start_time
-        print(f"Execution time without index: {execution_time_without_index} seconds")
+        print(teams_data)
 
         # Close the connection
         connection.close()
@@ -204,6 +203,8 @@ class GUI():
                 text_widget = Text(self.frame, width=25, height=11, bg='#333', fg='white', font=('Arial', 12))  # Create a gray text widget
                 text_widget.grid(row=i // 6, column=i % 6)  # Place the text widget in the appropriate row and column
                     
+
+
     def show_standings(self):
         
         # Connect to the SQLite database
@@ -382,8 +383,7 @@ class GUI():
         # Close the connection
         connection.close()
 
-
-        
+  
 # main        
 
 class Main():
