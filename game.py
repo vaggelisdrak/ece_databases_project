@@ -8,19 +8,19 @@ class AddPlayerForm:
         self.root = root
         self.root.title("Add/Remove Game Form")
 
-        # Frame to hold player information
+        # Frame to hold game information
         self.info_frame = ttk.LabelFrame(root, text="Game Information")
         self.info_frame.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
         # Fetch teams data from the database
         self.teams_data = self.get_teams_data()
 
-        # Labels and entry fields for player information
+        # Labels and entry fields for game information
         tk.Label(self.info_frame, text="Date (m/d/y):").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.date = tk.Entry(self.info_frame)
         self.date.grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
-        # Labels and entry fields for player information
+        # Labels and entry fields for game information
         tk.Label(self.info_frame, text="Game Type:").grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.game_type = tk.Entry(self.info_frame)
         self.game_type.insert(0, "REGULAR SEASON")
@@ -42,7 +42,7 @@ class AddPlayerForm:
 
         # 
 
-        # Button to add player to the database
+        # Button to add a game to the database
         self.add_button = tk.Button(root, text="Add Game", command=self.add_game)
         self.add_button.grid(row=4, column=0, padx=10, pady=10)
 
@@ -92,21 +92,22 @@ class AddPlayerForm:
             team1 = self.team1_id.get()
             team2 = self.team2_id.get()
 
-            # Get the last id_player from the database
+            # Get the last id_game from the database
             c.execute("SELECT MAX(id_game) FROM ΑΓΩΝΑΣ")
             last_id = c.fetchone()[0]
             
-            # If there are no players in the table yet, start from 1
+            # If there are no games in the table yet, start from 1
             if last_id is None:
                 last_id = 0
 
             new_id = last_id + 1  # Increment the last id by 1
 
+            # default is regular season game which is NOT a knockout game
             knock_out_game = 0
             if game_type != 'REGULAR SEASON':
                 knock_out_game = 1
 
-            # Execute INSERT INTO query to add player with the new id
+            # Execute INSERT INTO query to add game with the new id
             c.execute('''
                 INSERT INTO ΑΓΩΝΑΣ (Νικητής, Ηττημένος, Ημερομηνία, "KNOCK OUT GAME", Είδος, id_game)
                 VALUES (?, ?, ?, ?, ?, ?)

@@ -202,8 +202,6 @@ class GUI():
             for i in range(team_count, rows * 6):  # For each remaining cell in the grid
                 text_widget = Text(self.frame, width=25, height=11, bg='#333', fg='white', font=('Arial', 12))  # Create a gray text widget
                 text_widget.grid(row=i // 6, column=i % 6)  # Place the text widget in the appropriate row and column
-                    
-
 
     def show_standings(self):
         
