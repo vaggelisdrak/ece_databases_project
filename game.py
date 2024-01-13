@@ -6,7 +6,7 @@ import sqlite3
 class AddPlayerForm:
     def __init__(self, root):
         self.root = root
-        self.root.title("Add/Remove Game Form")
+        self.root.title("Add Game Form")
 
         # Frame to hold game information
         self.info_frame = ttk.LabelFrame(root, text="Game Information")
@@ -26,27 +26,30 @@ class AddPlayerForm:
         self.game_type.insert(0, "REGULAR SEASON")
         self.game_type.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
-        tk.Label(self.info_frame, text="Winner:").grid(row=2, column=0, padx=5, pady=5, sticky="w")
+        tk.Label(self.info_frame, text="Home Team:").grid(row=2, column=0, padx=5, pady=5, sticky="w")
         # Dropdown menu for teams using Combobox
         self.team1_id = tk.StringVar(root)
         self.team1_combobox = ttk.Combobox(self.info_frame, textvariable=self.team1_id, state='readonly')
         self.team1_combobox['values'] = [team[0] for team in self.teams_data]
         self.team1_combobox.grid(row=2, column=1, padx=5, pady=5, sticky="w")
 
-        tk.Label(self.info_frame, text="Loser:").grid(row=3, column=0, padx=5, pady=5, sticky="w")
+        tk.Label(self.info_frame, text="Away Team:").grid(row=3, column=0, padx=5, pady=5, sticky="w")
         # Dropdown menu for teams using Combobox
         self.team2_id = tk.StringVar(root)
         self.team2_combobox = ttk.Combobox(self.info_frame, textvariable=self.team2_id, state='readonly')
         self.team2_combobox['values'] = [team[0] for team in self.teams_data]
         self.team2_combobox.grid(row=3, column=1, padx=5, pady=5, sticky="w")
 
+        # Labels and entry fields for game information
+        tk.Label(self.info_frame, text="Court:").grid(row=4, column=0, padx=5, pady=5, sticky="w")
+        self.court = tk.Entry(self.info_frame)
+        self.court.grid(row=4, column=1, padx=5, pady=5, sticky="w")
+
         # 
 
         # Button to add a game to the database
         self.add_button = tk.Button(root, text="Add Game", command=self.add_game)
         self.add_button.grid(row=4, column=0, padx=10, pady=10)
-
-
 
     def get_teams_data(self):
         try:
@@ -70,9 +73,8 @@ class AddPlayerForm:
             if conn:
                 conn.close()
 
-    def get_selected_team_id(self):
+    def get_selected_team_id(self, selected_team_name):
         # Find the selected team's ID
-        selected_team_name = self.team_id.get()
         print(selected_team_name)
         print('teams data', self.teams_data)
         for team in self.teams_data:
@@ -81,55 +83,63 @@ class AddPlayerForm:
         return None
 
     def add_game(self):
-        try:
-            # Connect to the database
-            conn = sqlite3.connect('project_db.db')
-            c = conn.cursor()
 
-            # Fetch values from entry fields
-            date = self.date.get()  # Fetch the date from the entry field
-            game_type = self.game_type.get()
-            team1 = self.team1_id.get()
-            team2 = self.team2_id.get()
+        # Connect to the database
+        conn = sqlite3.connect('project_db.db')
+        c = conn.cursor()
 
-            # Get the last id_game from the database
-            c.execute("SELECT MAX(id_game) FROM ΑΓΩΝΑΣ")
-            last_id = c.fetchone()[0]
-            
-            # If there are no games in the table yet, start from 1
-            if last_id is None:
-                last_id = 0
+        # Fetch values from entry fields
+        date = self.date.get()  # Fetch the date from the entry field
+        game_type = self.game_type.get()
+        team1 = self.team1_id.get()
+        team2 = self.team2_id.get()
+        court = self.court.get()
 
-            new_id = last_id + 1  # Increment the last id by 1
+        # Get the last id_game from the database
+        c.execute("SELECT MAX(id_game) FROM ΑΓΩΝΑΣ")
+        last_id = c.fetchone()[0]
+        
+        # If there are no games in the table yet, start from 1
+        if last_id is None:
+            last_id = 0
 
-            # default is regular season game which is NOT a knockout game
-            knock_out_game = 0
-            if game_type != 'REGULAR SEASON':
-                knock_out_game = 1
+        new_id = last_id + 1  # Increment the last id by 1
 
-            # Execute INSERT INTO query to add game with the new id
-            c.execute('''
-                INSERT INTO ΑΓΩΝΑΣ (Νικητής, Ηττημένος, Ημερομηνία, "KNOCK OUT GAME", Είδος, id_game)
-                VALUES (?, ?, ?, ?, ?, ?)
-            ''', (team1, team2, date, knock_out_game, game_type ,new_id))
+        # default is regular season game which is NOT a knockout game
+        knock_out_game = 0
+        if game_type != 'REGULAR SEASON':
+            knock_out_game = 1
 
-            # Commit changes
-            conn.commit()
-            print("Game added successfully!")
-            # Show success message
-            messagebox.showinfo("Success", "Game added successfully!")
+        # Execute INSERT INTO query to add game with the new id
+        c.execute('''
+            INSERT INTO ΑΓΩΝΑΣ (Νικητής, Ηττημένος, Ημερομηνία, "KNOCK OUT GAME", Είδος, id_game)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', ("", "", date, knock_out_game, game_type ,new_id))
 
-        except sqlite3.Error as e:
-            # Show error message for database-related errors
-            messagebox.showerror("Database Error", f"An error occurred: {e}")
+        # game stats for team1-Home team
+        team1_id = self.get_selected_team_id(team1)
+        print(team1_id)
+        c.execute('''
+            INSERT INTO Παίζει (Γήπεδο, "HOME TEAM", "AWAY TEAM ", Turnovers, "FG%", "Points ΗΟΜΕ", "Points AWAY", id_team, id_game)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ? , ?)
+        ''', (court, team1, team2, "", "", "", "",team1_id,new_id))
 
-        except Exception as ex:
-            # Show error message for other exceptions
-            messagebox.showerror("Error", f"An unexpected error occurred: {ex}")
+        # game stats for team2-Away team
+        team2_id = self.get_selected_team_id(team2)
+        print(team2_id)
+        c.execute('''
+            INSERT INTO Παίζει (Γήπεδο, "HOME TEAM", "AWAY TEAM ", Turnovers, "FG%", "Points ΗΟΜΕ", "Points AWAY", id_team, id_game)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ? , ?)
+        ''', (court, team1, team2, "", "", "", "",team2_id,new_id))
 
-        finally:
-            if conn:
-                conn.close()
+        # Commit changes
+        conn.commit()
+        print("Game added successfully!")
+        # Show success message
+        messagebox.showinfo("Success", "Game added successfully!")
+
+
+        conn.close()
         
 
 # Create the Tkinter window
