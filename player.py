@@ -21,7 +21,7 @@ class AddPlayerForm:
         self.player_name.grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
         tk.Label(self.info_frame, text="Jersey Number:").grid(row=1, column=0, padx=5, pady=5, sticky="w")
-        self.jersey_number = tk.Spinbox(self.info_frame, from_=0, to=99)  # Set the range as needed
+        self.jersey_number = tk.Spinbox(self.info_frame, from_=0, to=99)
         self.jersey_number.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
         tk.Label(self.info_frame, text="Height (m):").grid(row=2, column=0, padx=5, pady=5, sticky="w")
@@ -29,13 +29,11 @@ class AddPlayerForm:
         self.height.grid(row=2, column=1, padx=5, pady=5, sticky="w")
 
         tk.Label(self.info_frame, text="Team:").grid(row=3, column=0, padx=5, pady=5, sticky="w")
-        # Dropdown menu for teams using Combobox
+        # Dropdown menu for showing teams using Combobox
         self.team_id = tk.StringVar(root)
         self.team_combobox = ttk.Combobox(self.info_frame, textvariable=self.team_id, state='readonly')
         self.team_combobox['values'] = [team[0] for team in self.teams_data]
         self.team_combobox.grid(row=3, column=1, padx=5, pady=5, sticky="w")
-
-        # 
 
         # Button to add player to the database
         self.add_button = tk.Button(root, text="Add Player", command=self.add_player)
@@ -142,10 +140,8 @@ class AddPlayerForm:
                 WHERE Ονοματεπώνυμο = ? AND "Αριθμός Φανέλας" = ?
             ''', (player_name, jersey_number))
 
-            # Commit changes
             conn.commit()
             print("Player removed successfully!")
-            # Show success message
             messagebox.showinfo("Success", "Player removed successfully!")
 
         except sqlite3.Error as e:

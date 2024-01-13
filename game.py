@@ -128,7 +128,6 @@ class AddPlayerForm:
             messagebox.showerror("Error", f"An unexpected error occurred: {ex}")
 
         finally:
-            # Close the connection
             if conn:
                 conn.close()
         
